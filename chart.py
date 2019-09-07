@@ -1,6 +1,9 @@
 import csv
 import spotipy
 import json
+import requests
+import lxml.html
+import urllib.parse
 
 client_id = ""
 client_secret = ""
@@ -49,7 +52,18 @@ for row in csv_reader:
             '" width="210" height="250" frameborder="0" allowtransparency="true" allow="encrypted-media" style="float:left;"></iframe>\n')
         good += 1
     except:
-        htm.write('<div width="210" height="250" style="float:left; width: 210;">' + artist + '<br>' + song + '</div>\n')
+        htm.write('<div width="210" height="250" style="float:left; width: 210;">' + artist + '<br>' + song)
+        try:
+            urlparams = urllib.parse.urlencode({'type': 'master', 'artist': artist, 'track': song})
+            # https://www.discogs.com/de/search/?type=master&artist=Dj+Dodger+Stadium&track=Love+songs
+            # //*[@id="search_results"]/div/a/span[2]/img
+            r = requests.get("https://www.discogs.com/de/search/?" + urlparams)
+            html = lxml.html.fromstring(r.text)
+            img = html.xpath('//*[@id="search_results"]/div/a/span/img')
+            htm.write("<img src='" + img[0].attrib['data-src'] + "' width='200'/>")
+        except:
+            None
+        htm.write('</div>\n')
         None
     writer.writerow(out)
     num += 1
