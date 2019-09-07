@@ -1,2 +1,2 @@
 # kzradio_asor
-kzradio parade asor stuff
+kzradio asor chart stuff
